@@ -42,7 +42,8 @@ public class T24Interface
     private String LogDir;
     private String listeningDir;
      Thread watcherthread = new Thread();
-     InputStream propertiesfile;       
+     InputStream propertiesfile;    
+    
     
        
      
@@ -835,6 +836,172 @@ private WebServiceLogger getServiceLogger(String filename){
         }
          return message;
     }   
+    
+    @WebMethod(operationName = "DirectDebit")
+    public TransactionResponse DirectDebit(@WebParam(name = "TransactionResponse") TransactionResponse debit) {
+  
+       try{  
+           
+           ofsParam param = new ofsParam();
+String[] credentials = new String[] { Ofsuser, Ofspass };
+param.setCredentials(credentials);
+           param.setOperation("FUNDS.TRANSFER");
+           param.setTransaction_id("");
+           String[] options = new String[] { "", "I", "PROCESS", "", "0" };
+param.setOptions(options);
+           
+           List<DataItem> items = new LinkedList<>();
+DataItem item = new DataItem();
+item.setItemHeader("RESPONSE.CODE");
+           item.setItemValues(new String[] {debit.getResponseCode()});
+           items.add(item);
+           
+           item = new DataItem();
+item.setItemHeader("RESPONSE.MESSAGE");
+           item.setItemValues(new String[] {debit.getResponseMessage()});
+           items.add(item);
+           
+           item = new DataItem();
+      
+           param.setDataItems(items);
+              //ACLK1308680628
+           String ofstr = t24.generateOFSTransactString(param);
+
+String result = t24.PostMsg(ofstr);
+           
+           if(t24.IsSuccessful(result)){
+           
+               debit.setResponseCode(result.split("/")[0]);
+               debit.setResponseMessage("Debit Successful");
+       }
+           else{
+               debit.setResponseCode("");
+               debit.setResponseMessage(result.split("/")[3]);
+           }
+           
+
+          
+        }
+        catch(Exception d){
+         this.getServiceLogger("service_monitor").LogError(d.getMessage(), d, Level.ERROR);    
+         debit.setResponseCode("");
+         debit.setResponseMessage(d.getMessage());
+         
+        }
+       return debit;  
+    } 
+    
+    @WebMethod(operationName = "DirectCredit")
+    public TransactionResponse DirectCredit(@WebParam(name = "TransactionResponse") TransactionResponse credit) {
+  
+       try{  
+           
+           ofsParam param = new ofsParam();
+String[] credentials = new String[] { Ofsuser, Ofspass };
+param.setCredentials(credentials);
+           param.setOperation("FUNDS.TRANSFER");
+           param.setTransaction_id("");
+           String[] options = new String[] { "", "I", "PROCESS", "", "0" };
+param.setOptions(options);
+           
+           List<DataItem> items = new LinkedList<>();
+DataItem item = new DataItem();
+item.setItemHeader("RESPONSE.CODE");
+           item.setItemValues(new String[] {credit.getResponseCode()});
+           items.add(item);
+           
+           item = new DataItem();
+item.setItemHeader("RESPONSE.MESSAGE");
+           item.setItemValues(new String[] {credit.getResponseMessage()});
+           items.add(item);
+           
+           item = new DataItem();
+      
+           param.setDataItems(items);
+              //ACLK1308680628
+           String ofstr = t24.generateOFSTransactString(param);
+
+String result = t24.PostMsg(ofstr);
+           
+           if(t24.IsSuccessful(result)){
+           
+               credit.setResponseCode(result.split("/")[0]);
+               credit.setResponseMessage("Debit Successful");
+       }
+           else{
+               credit.setResponseCode("");
+               credit.setResponseMessage(result.split("/")[3]);
+           }
+           
+
+          
+        }
+        catch(Exception d){
+         this.getServiceLogger("service_monitor").LogError(d.getMessage(), d, Level.ERROR);    
+         credit.setResponseCode("");
+         credit.setResponseMessage(d.getMessage());
+         
+        }
+       return credit;  
+    } 
+    
+       @WebMethod(operationName = "DirectCredit")
+    public TransactionResponse Reversal(@WebParam(name = "TransactionResponse") TransactionResponse reversal) {
+  
+       try{  
+           
+           ofsParam param = new ofsParam();
+String[] credentials = new String[] { Ofsuser, Ofspass };
+param.setCredentials(credentials);
+           param.setOperation("FUNDS.TRANSFER,REV.WD");
+           param.setTransaction_id("");
+           String[] options = new String[] { "", "I", "PROCESS", "", "0" };
+param.setOptions(options);
+           
+           List<DataItem> items = new LinkedList<>();
+DataItem item = new DataItem();
+item.setItemHeader("RESPONSE.CODE");
+           item.setItemValues(new String[] {reversal.getResponseCode()});
+           items.add(item);
+           
+           item = new DataItem();
+item.setItemHeader("RESPONSE.MESSAGE");
+           item.setItemValues(new String[] {reversal.getResponseMessage()});
+           items.add(item);
+           
+           item = new DataItem();
+      
+           param.setDataItems(items);
+              //ACLK1308680628
+           String ofstr = t24.generateOFSTransactString(param);
+
+String result = t24.PostMsg(ofstr);
+           
+           if(t24.IsSuccessful(result)){
+           
+               reversal.setResponseCode(result.split("/")[0]);
+               reversal.setResponseMessage("Reversal Successful");
+       }
+           else{
+               reversal.setResponseCode("");
+               reversal.setResponseMessage(result.split("/")[3]);
+           }
+           
+
+          
+        }
+        catch(Exception d){
+         this.getServiceLogger("service_monitor").LogError(d.getMessage(), d, Level.ERROR);    
+         reversal.setResponseCode("");
+         reversal.setResponseMessage(d.getMessage());
+         
+        }
+       return reversal;  
+    } 
+    
+    
+
+     
     
     
 }
