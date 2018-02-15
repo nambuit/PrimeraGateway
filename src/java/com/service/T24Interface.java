@@ -949,20 +949,86 @@ String result = t24.PostMsg(ofstr);
     
     @WebMethod(operationName = "DirectCredit")
     public TransactionResponse DirectCredit(@WebParam(name = "credit") TransactionRequest credit) {
-  TransactionResponse response = new TransactionResponse();
+ TransactionResponse response = new TransactionResponse();
        try{  
-         
+           
            ofsParam param = new ofsParam();
-String[] credentials = new String[] { Ofsuser, Ofspass };
-param.setCredentials(credentials);
-           param.setOperation("FUNDS.TRANSFER");
-          
+        String[] credentials = new String[] { Ofsuser, Ofspass };
+        param.setCredentials(credentials);
+                   param.setOperation("FUNDS.TRANSFER");
+                   param.setTransaction_id("");
+           param.setVersion("");
            String[] options = new String[] { "", "I", "PROCESS", "", "0" };
-param.setOptions(options);
-          
- param.setTransaction_id("");
- param.setDataItems(new LinkedList<DataItem>());
-    
+            param.setOptions(options);
+            
+            SimpleDateFormat ndf = new SimpleDateFormat("yyyyMMdd");
+            
+            Date date = new Date();
+            
+            String trandate = ndf.format(date);
+           
+           List<DataItem> items = new LinkedList<>();
+                     
+           DataItem item = new DataItem();
+           
+           item.setItemHeader("DEBIT.VALUE.DATE");
+           item.setItemValues(new String[] {trandate});
+           
+           items.add(item);
+           
+      
+           item = new DataItem();
+           item.setItemHeader("CREDIT.VALUE.DATE");
+           item.setItemValues(new String[] {trandate});
+           items.add(item);
+           
+           item = new DataItem();
+           item.setItemHeader("DEBIT.CURRENCY");
+           item.setItemValues(new String[] {"NGN"});
+           items.add(item);
+           
+           item = new DataItem();
+           item.setItemHeader("CREDIT.CURRENCY");
+           item.setItemValues(new String[] {"NGN"});
+           items.add(item);
+           
+           item = new DataItem();
+           item.setItemHeader("DEBIT.AMOUNT");
+           item.setItemValues(new String[] {credit.getAmount().toString()});
+           items.add(item);
+           
+           item = new DataItem();
+           item.setItemHeader("DEBIT.ACCT.NO");
+           item.setItemValues(new String[] {SettlementAcct});
+           items.add(item);
+                      
+           item = new DataItem();
+           item.setItemHeader("CREDIT.ACCT.NO");
+           item.setItemValues(new String[] {credit.getAccountNo()});
+           items.add(item);
+           
+//           item = new DataItem();
+//           item.setItemHeader("REM.REF");
+//           
+//           if(debit.().length()>65){
+//               fundstransfer.setNarration(fundstransfer.getNarration().substring(65));
+//           }
+           
+//           item.setItemValues(new String[] {fundstransfer.getNarration()});
+//           items.add(item);
+           
+//           item = new DataItem();
+//           item.setItemHeader("DEBIT.THEIR.REF");
+//           item.setItemValues(new String[] {fundstransfer.getNarration()});
+//           items.add(item);
+//           
+//           item = new DataItem();
+//           item.setItemHeader("CREDIT.THEIR.REF");
+//           item.setItemValues(new String[] {fundstransfer.getNarration()});
+//           items.add(item);
+           
+           param.setDataItems(items);
+           
            String ofstr = t24.generateOFSTransactString(param);
 
 String result = t24.PostMsg(ofstr);
@@ -989,6 +1055,7 @@ String result = t24.PostMsg(ofstr);
        return response;  
     } 
     
+    
        @WebMethod(operationName = "Reversal")
     public TransactionResponse Reversal(@WebParam(name = "reversal") TransactionRequest reversal) {
    TransactionResponse response = new TransactionResponse();
@@ -1012,7 +1079,7 @@ String result = t24.PostMsg(ofstr);
            if(t24.IsSuccessful(result)){
            
                response.setResponseCode(result.split("/")[0]);
-               response.setResponseMessage("Credit Successful");
+               response.setResponseMessage("Reversal Successful");
        }
            else{
                response.setResponseCode("");
