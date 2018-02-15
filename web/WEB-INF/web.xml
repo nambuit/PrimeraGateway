@@ -49,6 +49,11 @@
         <env-entry-type>java.lang.String</env-entry-type>
         <env-entry-value>Y:\bnk.run\ATM.LOG</env-entry-value>
     </env-entry>
+        <env-entry>
+        <env-entry-name>SettlementAcct</env-entry-name>
+        <env-entry-type>java.lang.String</env-entry-type>
+        <env-entry-value>0753223445</env-entry-value>
+    </env-entry>
     <env-entry>
         <env-entry-name>ISOLogListenerDir</env-entry-name>
         <env-entry-type>java.lang.String</env-entry-type>
