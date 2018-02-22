@@ -44,7 +44,7 @@ public class T24Interface
      Thread watcherthread = new Thread();
      InputStream propertiesfile;  
      private String SettlementAcct;
-    
+    private ResponseCodes respcode;
     
        
      
@@ -899,12 +899,12 @@ private WebServiceLogger getServiceLogger(String filename){
            item.setItemValues(new String[] {SettlementAcct});
            items.add(item);
            
-           item = new DataItem();
-           item.setItemHeader("REM.REF");
-           
-           if(debit.getNarration().length()>65){
-               debit.setNarration(debit.getNarration().substring(65));
-          }
+//           item = new DataItem();
+//           item.setItemHeader("REM.REF");
+//           
+//           if(debit.getNarration().length()>65){
+//               debit.setNarration(debit.getNarration().substring(65));
+//          }
            
            item.setItemValues(new String[] {debit.getNarration()});
            items.add(item);
@@ -913,11 +913,7 @@ private WebServiceLogger getServiceLogger(String filename){
            item.setItemHeader("BONE.REF");
            item.setItemValues(new String[] {debit.getNarration()});
            items.add(item);
-           
-           item = new DataItem();
-           item.setItemHeader("BONE.REF");
-           item.setItemValues(new String[] {debit.getNarration()});
-           items.add(item);
+
            
            param.setDataItems(items);
            
@@ -929,6 +925,9 @@ String result = t24.PostMsg(ofstr);
            
                response.setT24Reference(result.split("/")[0]);
                response.setResponseMessage("Debit Successful");
+               respcode = ResponseCodes.SUCCESS;
+               response.setResponseCode(respcode.getCode());
+
                
                param.setCredentials(credentials);
                    param.setOperation("BANKONE.TRANSACTIONS.TABLE");
@@ -1000,19 +999,28 @@ String result = t24.PostMsg(ofstr);
             param.setDataItems(items);
            
             ofstr = t24.generateOFSTransactString(param);
+            
+            t24.PostMsg(ofstr);
        }
            else{
-               response.setResponseCode("");
-               response.setResponseMessage(result.split("/")[3]);
+               
+                      respcode = getResponseCode(result.split("/")[3]);
+               response.setResponseCode(respcode.getCode());
+               response.setResponseMessage(respcode.getMessage());
+               
+     
            }
            
 
           
         }
         catch(Exception d){
+           respcode = ResponseCodes.Error;
+             response.setResponseCode(respcode.getCode());
+               response.setResponseMessage(respcode.getMessage());
+               
          this.getServiceLogger("service_monitor").LogError(d.getMessage(), d, Level.ERROR);    
-         response.setResponseCode("");
-         response.setResponseMessage(d.getMessage());
+
          
         }
        return response;  
@@ -1069,7 +1077,7 @@ String result = t24.PostMsg(ofstr);
            
            item = new DataItem();
            item.setItemHeader("DEBIT.AMOUNT");
-           item.setItemValues(new String[] {credit.getAmount().toString()});
+           item.setItemValues(new String[] {credit.getAmount()});
            items.add(item);
            
            item = new DataItem();
@@ -1081,13 +1089,13 @@ String result = t24.PostMsg(ofstr);
            item.setItemHeader("CREDIT.ACCT.NO");
            item.setItemValues(new String[] {credit.getAccountNo()});
            items.add(item);
-           
-           item = new DataItem();
-           item.setItemHeader("REM.REF");
-           
-           if(credit.getNarration().length()>65){
-               credit.setNarration(credit.getNarration().substring(65));
-           }
+//           
+//           item = new DataItem();
+//           item.setItemHeader("REM.REF");
+//           
+//           if(credit.getNarration().length()>65){
+//               credit.setNarration(credit.getNarration().substring(65));
+//           }
            
            item.setItemValues(new String[] {credit.getNarration()});
            items.add(item);
@@ -1096,13 +1104,7 @@ String result = t24.PostMsg(ofstr);
            item.setItemHeader("BONE.REF");
            item.setItemValues(new String[] {credit.getNarration()});
            items.add(item);
-           
-           item = new DataItem();
-           item.setItemHeader("BONE.REF");
-           item.setItemValues(new String[] {credit.getNarration()});
-           items.add(item);
-         
-           param.setDataItems(items);
+
            
            String ofstr = t24.generateOFSTransactString(param);
 
@@ -1110,8 +1112,12 @@ String result = t24.PostMsg(ofstr);
            
            if(t24.IsSuccessful(result)){
            
-               response.setT24Reference(result.split("/")[0]);
+               
+             response.setT24Reference(result.split("/")[0]);
                response.setResponseMessage("Credit Successful");
+               respcode = ResponseCodes.SUCCESS;
+               response.setResponseCode(respcode.getCode());
+
                
         param.setCredentials(credentials);
                    param.setOperation("BANKONE.TRANSACTIONS.TABLE");
@@ -1183,21 +1189,24 @@ String result = t24.PostMsg(ofstr);
            
             ofstr = t24.generateOFSTransactString(param);
            
-           
+            t24.PostMsg(ofstr);
                    
        }
            else{
-               response.setResponseCode("");
-               response.setResponseMessage(result.split("/")[3]);
+            respcode = getResponseCode(result.split("/")[3]);
+               response.setResponseCode(respcode.getCode());
+               response.setResponseMessage(respcode.getMessage());
            }
            
 
           
         }
         catch(Exception d){
+         respcode = ResponseCodes.Error;
+             response.setResponseCode(respcode.getCode());
+               response.setResponseMessage(respcode.getMessage());
          this.getServiceLogger("service_monitor").LogError(d.getMessage(), d, Level.ERROR);    
-         response.setResponseCode("");
-         response.setResponseMessage(d.getMessage());
+
          
         }
        return response;  
@@ -1230,24 +1239,59 @@ String result = t24.PostMsg(ofstr);
                response.setResponseMessage("Reversal Successful");
        }
            else{
-               response.setResponseCode("");
-               response.setResponseMessage(result.split("/")[3]);
+                 respcode = getResponseCode(result.split("/")[3]);
+               response.setResponseCode(respcode.getCode());
+               response.setResponseMessage(respcode.getMessage());
            }
            
 
           
         }
         catch(Exception d){
+          respcode = ResponseCodes.Error;
+             response.setResponseCode(respcode.getCode());
+               response.setResponseMessage(respcode.getMessage());
          this.getServiceLogger("service_monitor").LogError(d.getMessage(), d, Level.ERROR);    
-         response.setResponseCode("");
-         response.setResponseMessage(d.getMessage());
+ 
          
         }
        return response;  
     } 
     
     
-
+ private ResponseCodes getResponseCode(String message){
+   
+      ResponseCodes respcode = ResponseCodes.Error;
+      
+    message = message.toLowerCase();
+   
+   if(message.contains("ACCOUNT RECORD MISSING".toLowerCase())||message.contains("found that matched the selection criteria"))
+   {
+      respcode =  ResponseCodes.Invalid_Account;
+   }
+   
+     if(message.contains("is inactive")){
+      respcode =  ResponseCodes.Dormant_Account;
+   }
+   
+     
+          if(message.contains("IS FLAGGED FOR ONLINE CLOSURE".toLowerCase())){
+      respcode =  ResponseCodes.Invalid_Account;
+   }
+          
+        if(message.contains("Insolvent".toLowerCase())){
+      respcode =  ResponseCodes.Do_not_honor;
+   }
+   
+        
+          if(message.contains("Unauthorised overdraft".toLowerCase())){
+      respcode =  ResponseCodes.No_sufficient_funds;
+   }
+    
+     
+       
+       return respcode;
+  }
      
     
     
