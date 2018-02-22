@@ -197,6 +197,14 @@ public class T24Link {
             StringBuilder output = new StringBuilder();
 
             output.append(param.getOperation().toUpperCase()).append(',');
+            
+
+                if(param.getVersion()==null){
+               param.setVersion("");
+           }
+            
+            output.append(param.getVersion());
+
 
             String options = String.join("/", param.getOptions());
 
@@ -205,9 +213,13 @@ public class T24Link {
             String credentials = String.join("/", param.getCredentials());
             
             output.append(credentials).append(",");
+            
+                     if(param.getTransaction_id()==null){
+               param.setTransaction_id("");
+           }
 
             output.append(param.getTransaction_id()).append(",");
-
+ 
             param.getDataItems().stream().forEach((dataitem) -> {
                 Boolean isMultivalue = dataitem.getItemValues().length > 1;
 
@@ -227,8 +239,7 @@ public class T24Link {
            
 
             return result;
-        }
-   
+        }   
   
   public Boolean IsSuccessful(String ofsresposne)throws Exception{
       

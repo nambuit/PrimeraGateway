@@ -19,24 +19,35 @@ import lombok.Setter;
 @XmlRootElement(name = "TransactionRequest")
 public class TransactionRequest {
     
-    @XmlElement(name = "Stan")
+   
    private String Stan;
      
-     @XmlElement(name = "ReferenceNo")
+     
    private String ReferenceNo;
       
-     @XmlElement(name = "Amount")
-   private BigDecimal Amount;
+     
+   private String Amount;
        
-     @XmlElement(name = "AccountNo")
+     
    private String AccountNo;
         
-     @XmlElement(name = "TransactionType")
+     
    private String TransactionType;
          
-     @XmlElement(name = "TerminalID")
+     
    private String TerminalID;
      
-      @XmlElement(name = "ServiceCode")
+      
    private String ServiceCode;
+      
+       
+   private String Narration;
+       
+        
+   private String Currency;
+        
+         
+   private String LogDate;
+   
+   private String T24Reference;
 }

@@ -19,11 +19,13 @@ import lombok.Setter;
 @XmlRootElement(name = "TransactionResponse")
 public class TransactionResponse {
     
-     @XmlElement(name = "ResponseCode")
+     
     private String ResponseCode;
       
-     @XmlElement(name = "ResponseMessage")
+     
     private String ResponseMessage;
+    
+    private String T24Reference;
        
       
 }

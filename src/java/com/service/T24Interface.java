@@ -66,7 +66,7 @@ public class T24Interface
         String OFSsource = (String)ctx.lookup("OFSsource");
         Ofsuser = (String)ctx.lookup("OFSuser");
         Ofspass = (String)ctx.lookup("OFSpass");
-          SettlementAcct = (String)ctx.lookup("SettlementAcct");
+        SettlementAcct = (String)ctx.lookup("SettlementAcct");
         ImageBase = (String)ctx.lookup("ImageBase");
         t24 = new T24Link(Host, port, OFSsource);
         ISOofsSource = (String)ctx.lookup("ISO_OFSsource");
@@ -553,7 +553,7 @@ String[] credentials = new String[] { Ofsuser, Ofspass };
 param.setCredentials(credentials);
            param.setOperation("AC.LOCKED.EVENTS");
            param.setTransaction_id("");
-           String[] options = new String[] { "", "I", "PROCESS", "", "0" };
+           String[] options = new String[] { "", "I", "PROCESS", "2", "0" };
 param.setOptions(options);
            
            List<DataItem> items = new LinkedList<>();
@@ -629,7 +629,7 @@ String[] credentials = new String[] { Ofsuser, Ofspass };
 param.setCredentials(credentials);
            param.setOperation("AC.LOCKED.EVENTS");
            param.setTransaction_id(details.getReferenceNo());
-           String[] options = new String[] { "", "R", "PROCESS", "", "0" };
+           String[] options = new String[] { "", "R", "PROCESS", "2", "0" };
 param.setOptions(options);
            
            List<DataItem> items = new LinkedList<>();
@@ -682,7 +682,7 @@ String[] credentials = new String[] { Ofsuser, Ofspass };
 param.setCredentials(credentials);
            param.setOperation("CUSTOMER");
            param.setTransaction_id(CustomerID);
-           String[] options = new String[] { "", "I", "PROCESS", "", "0" };
+           String[] options = new String[] { "", "I", "PROCESS", "2", "0" };
 param.setOptions(options);
            
            List<DataItem> items = new LinkedList<>();
@@ -849,44 +849,44 @@ private WebServiceLogger getServiceLogger(String filename){
         param.setCredentials(credentials);
                    param.setOperation("FUNDS.TRANSFER");
                    param.setTransaction_id("");
-           param.setVersion("");
-           String[] options = new String[] { "", "I", "PROCESS", "", "0" };
+           param.setVersion("PRIMERA");
+           String[] options = new String[] { "", "I", "PROCESS", "2", "0" };
             param.setOptions(options);
             
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
             SimpleDateFormat ndf = new SimpleDateFormat("yyyyMMdd");
             
-            Date date = new Date();
-            
-            String trandate = ndf.format(date);
+             Date trandate = sdf.parse(debit.getLogDate());
+             debit.setLogDate(ndf.format(trandate));
            
            List<DataItem> items = new LinkedList<>();
                      
            DataItem item = new DataItem();
            
            item.setItemHeader("DEBIT.VALUE.DATE");
-           item.setItemValues(new String[] {trandate});
+           item.setItemValues(new String[] {debit.getLogDate()});
            
-           items.add(item);
+//           items.add(item);
            
       
            item = new DataItem();
            item.setItemHeader("CREDIT.VALUE.DATE");
-           item.setItemValues(new String[] {trandate});
-           items.add(item);
+           item.setItemValues(new String[] {debit.getLogDate()});
+//           items.add(item);
            
            item = new DataItem();
            item.setItemHeader("DEBIT.CURRENCY");
-           item.setItemValues(new String[] {"NGN"});
+           item.setItemValues(new String[] {debit.getCurrency()});
            items.add(item);
            
            item = new DataItem();
            item.setItemHeader("CREDIT.CURRENCY");
-           item.setItemValues(new String[] {"NGN"});
+           item.setItemValues(new String[] {debit.getCurrency()});
            items.add(item);
            
            item = new DataItem();
            item.setItemHeader("DEBIT.AMOUNT");
-           item.setItemValues(new String[] {debit.getAmount().toString()});
+           item.setItemValues(new String[] {debit.getAmount()});
            items.add(item);
            
            item = new DataItem();
@@ -899,25 +899,25 @@ private WebServiceLogger getServiceLogger(String filename){
            item.setItemValues(new String[] {SettlementAcct});
            items.add(item);
            
-//           item = new DataItem();
-//           item.setItemHeader("REM.REF");
-//           
-//           if(debit.().length()>65){
-//               fundstransfer.setNarration(fundstransfer.getNarration().substring(65));
-//           }
+           item = new DataItem();
+           item.setItemHeader("REM.REF");
            
-//           item.setItemValues(new String[] {fundstransfer.getNarration()});
-//           items.add(item);
+           if(debit.getNarration().length()>65){
+               debit.setNarration(debit.getNarration().substring(65));
+          }
            
-//           item = new DataItem();
-//           item.setItemHeader("DEBIT.THEIR.REF");
-//           item.setItemValues(new String[] {fundstransfer.getNarration()});
-//           items.add(item);
-//           
-//           item = new DataItem();
-//           item.setItemHeader("CREDIT.THEIR.REF");
-//           item.setItemValues(new String[] {fundstransfer.getNarration()});
-//           items.add(item);
+           item.setItemValues(new String[] {debit.getNarration()});
+           items.add(item);
+           
+           item = new DataItem();
+           item.setItemHeader("BONE.REF");
+           item.setItemValues(new String[] {debit.getNarration()});
+           items.add(item);
+           
+           item = new DataItem();
+           item.setItemHeader("BONE.REF");
+           item.setItemValues(new String[] {debit.getNarration()});
+           items.add(item);
            
            param.setDataItems(items);
            
@@ -927,8 +927,79 @@ String result = t24.PostMsg(ofstr);
            
            if(t24.IsSuccessful(result)){
            
-               response.setResponseCode(result.split("/")[0]);
+               response.setT24Reference(result.split("/")[0]);
                response.setResponseMessage("Debit Successful");
+               
+               param.setCredentials(credentials);
+                   param.setOperation("BANKONE.TRANSACTIONS.TABLE");
+                   param.setTransaction_id(debit.getReferenceNo());
+                   param.setOptions(options);
+                   
+                   
+           
+           item.setItemHeader("VALUE.DATE");
+           item.setItemValues(new String[] {debit.getLogDate()});
+           items.add(item);
+           
+            item = new DataItem();
+           item.setItemHeader("BOOKING.DATE");
+           item.setItemValues(new String[] {debit.getLogDate()});
+           items.add(item);
+           
+           item = new DataItem();
+           item.setItemHeader("STAN");
+           item.setItemValues(new String[] {debit.getStan()});
+           items.add(item);
+           
+           item = new DataItem();
+           item.setItemHeader("REFERENCE.NO");
+           item.setItemValues(new String[] {debit.getReferenceNo()});
+           items.add(item);
+           
+           item = new DataItem();
+           item.setItemHeader("TXN.AMOUNT");
+           item.setItemValues(new String[] {debit.getAmount()});
+           items.add(item);
+           
+           item = new DataItem();
+           item.setItemHeader("DEBIT.ACCT.NO");
+           item.setItemValues(new String[] {debit.getAccountNo()});
+           items.add(item);
+           
+           item = new DataItem();
+           item.setItemHeader("CREDIT.ACCT.NO");
+           item.setItemValues(new String[] {SettlementAcct});
+           items.add(item);
+           
+           item = new DataItem();
+           item.setItemHeader("TRANSACTION.TYPE");
+           item.setItemValues(new String[] {debit.getTransactionType()});
+           items.add(item);
+           
+           item = new DataItem();
+           item.setItemHeader("TERMINAL.ID");
+           item.setItemValues(new String[] {debit.getTerminalID()});
+           items.add(item);
+           
+           item = new DataItem();
+           item.setItemHeader("SERVICE.CODE");
+           item.setItemValues(new String[] {debit.getServiceCode()});
+           items.add(item);
+           
+           item = new DataItem();
+           item.setItemHeader("NARRATION");
+           item.setItemValues(new String[] {debit.getNarration()});
+           items.add(item);
+           
+           item = new DataItem();
+           item.setItemHeader("TXN.CURRENCY");
+           item.setItemValues(new String[] {debit.getCurrency()});
+           items.add(item);
+           
+           
+            param.setDataItems(items);
+           
+            ofstr = t24.generateOFSTransactString(param);
        }
            else{
                response.setResponseCode("");
@@ -957,39 +1028,43 @@ String result = t24.PostMsg(ofstr);
         param.setCredentials(credentials);
                    param.setOperation("FUNDS.TRANSFER");
                    param.setTransaction_id("");
-           param.setVersion("");
-           String[] options = new String[] { "", "I", "PROCESS", "", "0" };
+           param.setVersion("PRIMERA");
+           String[] options = new String[] { "", "I", "PROCESS", "2", "0" };
             param.setOptions(options);
             
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
             SimpleDateFormat ndf = new SimpleDateFormat("yyyyMMdd");
             
-            Date date = new Date();
+             Date trandate = sdf.parse(credit.getLogDate());
+             credit.setLogDate(ndf.format(trandate));
             
-            String trandate = ndf.format(date);
+            //Date date = new Date();
+            
+            //String trandate = ndf.format(date);
            
            List<DataItem> items = new LinkedList<>();
                      
            DataItem item = new DataItem();
            
            item.setItemHeader("DEBIT.VALUE.DATE");
-           item.setItemValues(new String[] {trandate});
+           item.setItemValues(new String[] {credit.getLogDate()});
            
-           items.add(item);
+//           items.add(item);
            
       
            item = new DataItem();
            item.setItemHeader("CREDIT.VALUE.DATE");
-           item.setItemValues(new String[] {trandate});
-           items.add(item);
+           item.setItemValues(new String[] {credit.getLogDate()});
+//           items.add(item);
            
            item = new DataItem();
            item.setItemHeader("DEBIT.CURRENCY");
-           item.setItemValues(new String[] {"NGN"});
+           item.setItemValues(new String[] {credit.getCurrency()});
            items.add(item);
            
            item = new DataItem();
            item.setItemHeader("CREDIT.CURRENCY");
-           item.setItemValues(new String[] {"NGN"});
+           item.setItemValues(new String[] {credit.getCurrency()});
            items.add(item);
            
            item = new DataItem();
@@ -1007,26 +1082,26 @@ String result = t24.PostMsg(ofstr);
            item.setItemValues(new String[] {credit.getAccountNo()});
            items.add(item);
            
-//           item = new DataItem();
-//           item.setItemHeader("REM.REF");
-//           
-//           if(debit.().length()>65){
-//               fundstransfer.setNarration(fundstransfer.getNarration().substring(65));
-//           }
+           item = new DataItem();
+           item.setItemHeader("REM.REF");
            
-//           item.setItemValues(new String[] {fundstransfer.getNarration()});
-//           items.add(item);
+           if(credit.getNarration().length()>65){
+               credit.setNarration(credit.getNarration().substring(65));
+           }
            
-//           item = new DataItem();
-//           item.setItemHeader("DEBIT.THEIR.REF");
-//           item.setItemValues(new String[] {fundstransfer.getNarration()});
-//           items.add(item);
-//           
-//           item = new DataItem();
-//           item.setItemHeader("CREDIT.THEIR.REF");
-//           item.setItemValues(new String[] {fundstransfer.getNarration()});
-//           items.add(item);
+           item.setItemValues(new String[] {credit.getNarration()});
+           items.add(item);
            
+           item = new DataItem();
+           item.setItemHeader("BONE.REF");
+           item.setItemValues(new String[] {credit.getNarration()});
+           items.add(item);
+           
+           item = new DataItem();
+           item.setItemHeader("BONE.REF");
+           item.setItemValues(new String[] {credit.getNarration()});
+           items.add(item);
+         
            param.setDataItems(items);
            
            String ofstr = t24.generateOFSTransactString(param);
@@ -1035,8 +1110,81 @@ String result = t24.PostMsg(ofstr);
            
            if(t24.IsSuccessful(result)){
            
-               response.setResponseCode(result.split("/")[0]);
+               response.setT24Reference(result.split("/")[0]);
                response.setResponseMessage("Credit Successful");
+               
+        param.setCredentials(credentials);
+                   param.setOperation("BANKONE.TRANSACTIONS.TABLE");
+                   param.setTransaction_id(credit.getReferenceNo());
+                   param.setOptions(options);
+                   
+                   
+           
+           item.setItemHeader("VALUE.DATE");
+           item.setItemValues(new String[] {credit.getLogDate()});
+           items.add(item);
+           
+            item = new DataItem();
+           item.setItemHeader("BOOKING.DATE");
+           item.setItemValues(new String[] {credit.getLogDate()});
+           items.add(item);
+           
+           item = new DataItem();
+           item.setItemHeader("STAN");
+           item.setItemValues(new String[] {credit.getStan()});
+           items.add(item);
+           
+           item = new DataItem();
+           item.setItemHeader("REFERENCE.NO");
+           item.setItemValues(new String[] {credit.getReferenceNo()});
+           items.add(item);
+           
+           item = new DataItem();
+           item.setItemHeader("TXN.AMOUNT");
+           item.setItemValues(new String[] {credit.getAmount()});
+           items.add(item);
+           
+           item = new DataItem();
+           item.setItemHeader("DEBIT.ACCT.NO");
+           item.setItemValues(new String[] {SettlementAcct});
+           items.add(item);
+           
+           item = new DataItem();
+           item.setItemHeader("CREDIT.ACCT.NO");
+           item.setItemValues(new String[] {credit.getAccountNo()});
+           items.add(item);
+           
+           item = new DataItem();
+           item.setItemHeader("TRANSACTION.TYPE");
+           item.setItemValues(new String[] {credit.getTransactionType()});
+           items.add(item);
+           
+           item = new DataItem();
+           item.setItemHeader("TERMINAL.ID");
+           item.setItemValues(new String[] {credit.getTerminalID()});
+           items.add(item);
+           
+           item = new DataItem();
+           item.setItemHeader("SERVICE.CODE");
+           item.setItemValues(new String[] {credit.getServiceCode()});
+           items.add(item);
+           
+           item = new DataItem();
+           item.setItemHeader("NARRATION");
+           item.setItemValues(new String[] {credit.getNarration()});
+           items.add(item);
+           
+           item = new DataItem();
+           item.setItemHeader("TXN.CURRENCY");
+           item.setItemValues(new String[] {credit.getCurrency()});
+           items.add(item);
+           
+           param.setDataItems(items);
+           
+            ofstr = t24.generateOFSTransactString(param);
+           
+           
+                   
        }
            else{
                response.setResponseCode("");
@@ -1065,11 +1213,11 @@ String result = t24.PostMsg(ofstr);
 String[] credentials = new String[] { Ofsuser, Ofspass };
 param.setCredentials(credentials);
            param.setOperation("FUNDS.TRANSFER");
-          
-           String[] options = new String[] { "", "I", "PROCESS", "", "0" };
+           param.setVersion("REV.WD");
+           String[] options = new String[] { "", "R", "PROCESS", "2", "0" };
 param.setOptions(options);
           
- param.setTransaction_id("");
+ param.setTransaction_id(reversal.getT24Reference());
  param.setDataItems(new LinkedList<DataItem>());
     
            String ofstr = t24.generateOFSTransactString(param);

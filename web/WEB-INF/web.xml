@@ -12,17 +12,17 @@
       <env-entry>
         <env-entry-name>HOST</env-entry-name>
         <env-entry-type>java.lang.String</env-entry-type>
-        <env-entry-value>172.16.16.17</env-entry-value>
+        <env-entry-value>192.168.10.43</env-entry-value>
     </env-entry>
     <env-entry>
         <env-entry-name>PORT</env-entry-name>
         <env-entry-type>java.lang.String</env-entry-type>
-        <env-entry-value>20007</env-entry-value>
+        <env-entry-value>20002</env-entry-value>
     </env-entry>
       <env-entry>
         <env-entry-name>OFSsource</env-entry-name>
         <env-entry-type>java.lang.String</env-entry-type>
-        <env-entry-value>BankOne</env-entry-value>
+        <env-entry-value>NambuitChannels</env-entry-value>
     </env-entry>   
     <env-entry>
         <env-entry-name>ISO_OFSsource</env-entry-name>
@@ -32,12 +32,12 @@
          <env-entry>
         <env-entry-name>OFSuser</env-entry-name>
         <env-entry-type>java.lang.String</env-entry-type>
-        <env-entry-value>INLAKS01</env-entry-value>
+        <env-entry-value>INPUTT</env-entry-value>
     </env-entry>
         <env-entry>
         <env-entry-name>OFSpass</env-entry-name>
         <env-entry-type>java.lang.String</env-entry-type>
-        <env-entry-value>123456@Pcl</env-entry-value>
+        <env-entry-value>123456</env-entry-value>
     </env-entry>          
       <env-entry>
         <env-entry-name>ImageBase</env-entry-name>
@@ -52,12 +52,12 @@
         <env-entry>
         <env-entry-name>SettlementAcct</env-entry-name>
         <env-entry-type>java.lang.String</env-entry-type>
-        <env-entry-value>0753223445</env-entry-value>
+        <env-entry-value>0010001190</env-entry-value>
     </env-entry>
     <env-entry>
         <env-entry-name>ISOLogListenerDir</env-entry-name>
         <env-entry-type>java.lang.String</env-entry-type>
-        <env-entry-value>Y:\bnk.run\ATM.LOG</env-entry-value>
+        <env-entry-value>C:\ATM.LOG</env-entry-value>
     </env-entry>
      
 </web-app>
