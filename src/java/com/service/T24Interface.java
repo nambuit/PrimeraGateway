@@ -902,13 +902,13 @@ private WebServiceLogger getServiceLogger(String filename){
 //           item = new DataItem();
 //           item.setItemHeader("REM.REF");
 //           
-//           if(debit.getNarration().length()>65){
-//               debit.setNarration(debit.getNarration().substring(65));
-//          }
+           if(debit.getNarration().length()>65){
+               debit.setNarration(debit.getNarration().substring(65));
+         }
            
-           item.setItemValues(new String[] {debit.getNarration()});
-           items.add(item);
-           
+//           item.setItemValues(new String[] {debit.getNarration()});
+//           items.add(item);
+//           
            item = new DataItem();
            item.setItemHeader("BONE.REF");
            item.setItemValues(new String[] {debit.getNarration()});
@@ -919,7 +919,7 @@ private WebServiceLogger getServiceLogger(String filename){
            
            String ofstr = t24.generateOFSTransactString(param);
 
-String result = t24.PostMsg(ofstr);
+           String result = t24.PostMsg(ofstr);
            
            if(t24.IsSuccessful(result)){
            
@@ -1017,7 +1017,7 @@ String result = t24.PostMsg(ofstr);
         catch(Exception d){
            respcode = ResponseCodes.Error;
              response.setResponseCode(respcode.getCode());
-               response.setResponseMessage(respcode.getMessage());
+               response.setResponseMessage(d.getMessage());
                
          this.getServiceLogger("service_monitor").LogError(d.getMessage(), d, Level.ERROR);    
 
@@ -1093,21 +1093,23 @@ String result = t24.PostMsg(ofstr);
 //           item = new DataItem();
 //           item.setItemHeader("REM.REF");
 //           
-//           if(credit.getNarration().length()>65){
-//               credit.setNarration(credit.getNarration().substring(65));
-//           }
+           if(credit.getNarration().length()>65){
+               credit.setNarration(credit.getNarration().substring(65));
+           }
            
-           item.setItemValues(new String[] {credit.getNarration()});
-           items.add(item);
+//           item.setItemValues(new String[] {credit.getNarration()});
+//           items.add(item);
            
            item = new DataItem();
            item.setItemHeader("BONE.REF");
            item.setItemValues(new String[] {credit.getNarration()});
            items.add(item);
 
-           
+            param.setDataItems(items);
+            
+            
            String ofstr = t24.generateOFSTransactString(param);
-
+           
 String result = t24.PostMsg(ofstr);
            
            if(t24.IsSuccessful(result)){
@@ -1124,8 +1126,10 @@ String result = t24.PostMsg(ofstr);
                    param.setTransaction_id(credit.getReferenceNo());
                    param.setOptions(options);
                    
-                   
            
+           items = new LinkedList<>();
+           
+           item = new DataItem();
            item.setItemHeader("VALUE.DATE");
            item.setItemValues(new String[] {credit.getLogDate()});
            items.add(item);
@@ -1189,8 +1193,9 @@ String result = t24.PostMsg(ofstr);
            
             ofstr = t24.generateOFSTransactString(param);
            
-            t24.PostMsg(ofstr);
-                   
+           result = t24.PostMsg(ofstr);
+        
+           System.out.print(result);
        }
            else{
             respcode = getResponseCode(result.split("/")[3]);
@@ -1204,7 +1209,7 @@ String result = t24.PostMsg(ofstr);
         catch(Exception d){
          respcode = ResponseCodes.Error;
              response.setResponseCode(respcode.getCode());
-               response.setResponseMessage(respcode.getMessage());
+               response.setResponseMessage(d.getMessage());
          this.getServiceLogger("service_monitor").LogError(d.getMessage(), d, Level.ERROR);    
 
          
@@ -1222,6 +1227,7 @@ String result = t24.PostMsg(ofstr);
 String[] credentials = new String[] { Ofsuser, Ofspass };
 param.setCredentials(credentials);
            param.setOperation("FUNDS.TRANSFER");
+//           param.setVersion("REV.WD");
            param.setVersion("REV.WD");
            String[] options = new String[] { "", "R", "PROCESS", "2", "0" };
 param.setOptions(options);
@@ -1250,7 +1256,7 @@ String result = t24.PostMsg(ofstr);
         catch(Exception d){
           respcode = ResponseCodes.Error;
              response.setResponseCode(respcode.getCode());
-               response.setResponseMessage(respcode.getMessage());
+               response.setResponseMessage(d.getMessage());
          this.getServiceLogger("service_monitor").LogError(d.getMessage(), d, Level.ERROR);    
  
          
