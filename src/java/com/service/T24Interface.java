@@ -1240,8 +1240,8 @@ param.setOptions(options);
 String result = t24.PostMsg(ofstr);
            
            if(t24.IsSuccessful(result)){
-           
-               response.setResponseCode(result.split("/")[0]);
+               respcode =  ResponseCodes.SUCCESS;
+               response.setResponseCode(respcode.getCode());
                response.setResponseMessage("Reversal Successful");
        }
            else{
@@ -1280,6 +1280,10 @@ String result = t24.PostMsg(ofstr);
       respcode =  ResponseCodes.Dormant_Account;
    }
    
+    
+        if(message.contains("HISTORY RECORD MISSING".toLowerCase())){
+      respcode =  ResponseCodes.Unable_to_locate_record;
+   }
      
           if(message.contains("IS FLAGGED FOR ONLINE CLOSURE".toLowerCase())){
       respcode =  ResponseCodes.Invalid_Account;

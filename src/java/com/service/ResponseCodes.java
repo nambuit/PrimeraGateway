@@ -18,7 +18,7 @@ package com.service;
   Error("06","Error"),
   No_action_taken("21","No action taken"),
   Dormant_Account("26","Dormant Account"),
-  Invalid_Account("07","Invalid Account"),
+  Invalid_Account("52","Invalid Account"),
   Do_not_honor("05","Do not honor"),
   Request_processing_in_progress("09","Request processing in progress"),
   Invalid_transaction("12","Invalid transaction"),
